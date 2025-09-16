@@ -29,6 +29,7 @@ tags, and then generate with `hack/update-toc.sh`.
         - [Unit Tests](#unit-tests)
         - [Integration tests](#integration-tests)
         - [End to End Tests](#end-to-end-tests)
+- [Related Works](#related-works)
 <!-- /toc -->
 
 ## Motivation
@@ -107,19 +108,7 @@ Consider including folks who also work outside the SIG or subproject.
 
 The overall desgin of `InstanceSet`. 
 
-
-### Related Works
-
-#### Feature Comparison: InstanceSet vs LeaderWorkerSet (LWS)
-
-| Feature                                              | InstanceSet | LWS |
-|------------------------------------------------------|-------------|-----------------|
-| Pod traffic lifecycle binding within an Instance     | ✅ Yes       | ❌ No            |
-| Gang scheduling semantics at Instance granularity    | ✅ Yes       | ❌ No            |
-| Support for in-place upgrade / restart               | ✅ Yes       | ❌ No            |
-| Allow modifying `Size` and more configuration fields | ✅ Yes       | ❌ No            |
-| Support `MaxSurge` upgrade strategy at Instance level       | ✅ Yes       | ❌ No            |
-
+![instanceset architecture](./instanceset-arch.jpeg)
 
 <!--
 This section should contain enough information that the specifics of your
@@ -158,7 +147,7 @@ spec:
     readinessGates:
       - conditionType: InPlaceUpdateReady
     components:
-    - class: leader
+    - name: leader
       size: 1
       serviceName: deepseek-r1-master
       template:
@@ -170,7 +159,7 @@ spec:
           - name: llmservice
             image: vllm/deepseek:r1
             command: ["/run.sh", "--master"]
-    - class: worker
+    - name: worker
       size: 2
       serviceName: deepseek-r1-slave
       template:
@@ -230,7 +219,7 @@ metadata:
     llm: deepseek-r1-ep32
 spec:
  components:
- - class: leader
+ - name: leader
    size: 1
    serviceName: deepseek-r1-master
    template:
@@ -243,7 +232,7 @@ spec:
        - name: llmservice
          image: vllm/deepseek:r1
          command: ["/run.sh", "--master"]
-- class: worker
+- name: worker
    size: 2
    serviceName: deepseek-r1-slave
    template:
@@ -474,6 +463,20 @@ After the implementation PR is merged, add the names of the tests here.
 -->
 
 #### End to End Tests
+
+
+## Related Works
+
+### Feature Comparison: InstanceSet vs LeaderWorkerSet (LWS)
+
+| Feature                                              | InstanceSet | LWS |
+|------------------------------------------------------|-------------|-----------------|
+| Pod traffic lifecycle binding within an Instance     | ✅ Yes       | ❌ No            |
+| Gang scheduling semantics at Instance granularity    | ✅ Yes       | ❌ No            |
+| Support for in-place upgrade / restart               | ✅ Yes       | ❌ No            |
+| Allow modifying `Size` and more configuration fields | ✅ Yes       | ❌ No            |
+| Support `MaxSurge` upgrade strategy at Instance level       | ✅ Yes       | ❌ No            |
+
 
 
 ## Alternatives
